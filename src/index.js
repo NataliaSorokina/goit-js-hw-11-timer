@@ -1,11 +1,13 @@
 import './sass/main.scss';
-import './js/dots';
+import './js/elems.js';
 import refs from './js/refs.js';
 import Swal from 'sweetalert2';
 
-refs.btn.setAttribute('disabled', true);
+refs.clearBtn = document.querySelector('[data-clear]');
+
+refs.startBtn.setAttribute('disabled', true);
 refs.input.addEventListener('input', getSelectedDate);
-refs.btn.addEventListener('click', getRemainingTime);
+// refs.btn.addEventListener('click', getRemainingTime);
 
 function getSelectedDate() {
   const selectedDate = new Date(refs.input.value);
@@ -17,20 +19,53 @@ function getSelectedDate() {
   'warning'
 )
   } else {
-    refs.btn.removeAttribute('disabled');
+    refs.startBtn.removeAttribute('disabled');
   }
 }
 
-function getRemainingTime() {
-  const selectedDate = Date.parse(new Date(refs.input.value)) - (180 * 60 * 1000);
-  setInterval(() => {
+const timer = {
+  intervalId: null,
+    
+  start() {
+    refs.startBtn.setAttribute('disabled', true);
+    refs.input.setAttribute('disabled', true);
+    const selectedDate = Date.parse(new Date(refs.input.value)) - (180 * 60 * 1000);
+            
+    this.intervalId = setInterval(() => {
             const currentTime = Date.now();
             const deltaTime = selectedDate - currentTime;
             const time = convertMs(deltaTime);
             
             updateClockface(time);
-        }, 1000)
+    }, 1000)  
+  },
+
+  stop() {
+    clearInterval(this.intervalId);
+    const time = convertMs(0);
+    updateClockface(time);
+    refs.input.value = '';
+    refs.input.removeAttribute('disabled', true);
+  }
 }
+
+refs.startBtn.addEventListener('click', () => {
+  timer.start()
+});
+refs.clearBtn.addEventListener('click', () => {
+  timer.stop()
+});
+
+// function getRemainingTime() {
+//   const selectedDate = Date.parse(new Date(refs.input.value)) - (180 * 60 * 1000);
+//   setInterval(() => {
+//             const currentTime = Date.now();
+//             const deltaTime = selectedDate - currentTime;
+//             const time = convertMs(deltaTime);
+            
+//             updateClockface(time);
+//         }, 1000)
+// }
 
 function updateClockface({ days, hours, minutes, seconds }) {
   refs.days.textContent = days;
@@ -63,6 +98,6 @@ function convertMs(ms) {
     return String(value).padStart(2, '0');
   }
 
-console.log(convertMs(2000)); // {days: 0, hours: 0, minutes: 0, seconds: 2}
-console.log(convertMs(140000)); //{days: 0, hours: 0, minutes: 2, seconds: 20}
-console.log(convertMs(24140000)); // {days: 0, hours: 6, minutes: 42, seconds: 20}
+// console.log(convertMs(2000)); // {days: 0, hours: 0, minutes: 0, seconds: 2}
+// console.log(convertMs(140000)); //{days: 0, hours: 0, minutes: 2, seconds: 20}
+// console.log(convertMs(24140000)); // {days: 0, hours: 6, minutes: 42, seconds: 20}

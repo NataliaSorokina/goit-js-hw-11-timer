@@ -14,5 +14,11 @@ button {
 
   &:disabled {
     background: rgb(198, 241, 198);
+    cursor: default;
+  }
+
+  &[data-clear] {
+    color: #fff;
+    background: cornflowerblue;
   }
 }
